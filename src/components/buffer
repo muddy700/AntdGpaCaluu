@@ -1,0 +1,78 @@
+import { Form, Input, Button, Select , label , InputNumber } from 'antd';
+import '../index.css'
+
+const { Option } = Select;
+
+   const layout = {
+       labelCol: {
+           span: 8
+       },
+       wrapperCol: {
+           span: 16
+       },
+   };
+   const tailLayout = {
+       wrapperCol: {
+           offset: 8,
+           span: 16
+       },
+   };
+
+ export const CourseForm = ( { grades , changeGrade , changeCredit }) => {
+
+const options =  grades.map((data) => {
+        return(
+            <option key={data.value} value={data.value} >{data.name}</option>
+        )
+    })
+ 
+
+    const Demo = () => {}
+            const onFinish = values => {
+                console.log('Success:', values);
+            };
+        
+            const onFinishFailed = errorInfo => {
+                console.log('Failed:', errorInfo);
+            };
+        
+    return(
+  <Form
+      {...layout}
+      name="basic"
+      initialValues={{ remember: true }}
+      onFinish={onFinish}
+      onFinishFailed={onFinishFailed}
+    >
+     <Form.Item
+        label="Course Id"
+        name="courseId"
+      >
+        <label > 1 </label>
+      </Form.Item>
+          <Form.Item name="grade" label="Course Grade" rules={[{ required: true , message: 'Please input Course Grade!' }]}>
+        <Select
+          placeholder="Select Course Grade"
+          onChange={(e) => changeGrade(e.target.value)}
+          allowClear
+        >
+        {options}
+        </Select>
+      </Form.Item>
+      <Form.Item
+        label="Course Credit"
+        name="credit"
+        rules={[{ required: true, message: 'Please input Course Credit!' }]}
+      >
+        <Input />
+        {/* <InputNumber /> */}
+      </Form.Item>
+
+      <Form.Item {...tailLayout}>
+        <Button type="primary" htmlType="submit">
+          Save
+        </Button>
+      </Form.Item>
+    </Form>
+    )
+    }
