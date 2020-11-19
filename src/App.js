@@ -20,6 +20,8 @@ const tailLayout = {
 
 let Id = 0
 const App = () => {
+
+  
   
   const columns = [
     {
@@ -52,7 +54,7 @@ const App = () => {
   // const initialCourses = [
   //   { key : 1 , id : 1 , gradePoint : 2 , gradeLetter : 'C', credit : 10},
   //   { key : 2 , id : 2 , gradePoint : 5 , gradeLetter : 'A' , credit : 7},
-            // ]
+  // ]
   // const course = { id :'' , gradePoint : '' , gradeLetter : '' , credit : ''}
   // const [grades , setGrades ] = useState(initialGrades)
   const [courses , setCourses ]  = useState([])
@@ -62,6 +64,7 @@ const App = () => {
   const [activeCourse , setActiveCourse ] = useState({})
   const [selectedCourses , setSelectedCourses ] = useState([])
   const [loading, setLoading ] = useState(false)
+  const [form] = Form.useForm()
 
   const { Title } = Typography
   const { option } = Select
@@ -73,27 +76,33 @@ const App = () => {
     })
     
     const onFinish = values => {
+      // e.preventDefault()
+      form.resetFields()
       if(editingMode){
         const newCoursesList = courses.map((data) => {
-        if(data.id === activeCourse.id){
-          return {...data , gradeLetter : activeCourse.gradeLetter , gradePoint : activeCourse.gradePoint , credit : activeCourse.credit}
+          if(data.id === activeCourse.id){
+            return {...data , gradeLetter : activeCourse.gradeLetter , gradePoint : activeCourse.gradePoint , credit : activeCourse.credit}
         }
         else {
           return data
         }})
-
+        
         setCourses(newCoursesList)
         setEditingMode(false)
+        calculator()
+        form.setFieldsValue({  Grade : null})
       }
       else {
-
+        
         Id += 1
         setCourses([...courses , {...activeCourse , key : Id , id : Id}])
       }
-    };
+      setActiveCourse({})
+    }
+    
+    const calculator = () => {
+      form.resetFields()
 
-      const calculator = () => {
-        setActiveCourse({})
         if(courses.length <= 0){
           setGpa('')
         }
@@ -112,7 +121,8 @@ const App = () => {
       setGpa(gpa1)  
       console.log(courses.length)
     }
-
+    setActiveCourse({})
+      // form.setFieldsValue({cred : activeCourse.credit})
       }
     
     const onFinishFailed = errorInfo => {
@@ -160,6 +170,7 @@ const App = () => {
       const selected = courses.find((data) => data.id === value)
       setActiveCourse(selected)
       setEditingMode(true)
+      form.setFieldsValue({ Credit : selected.credit , Grade : selected.gradeLetter})
       console.log('coz ni ' + activeCourse.gradeLetter)
       console.log('id ni ' + activeCourse.id)
     }
@@ -171,33 +182,38 @@ const App = () => {
       onChange: onSelectChange,
     };
     const hasSelected = selectedCourses.length > 0
+    const formTitle = editingMode ? 'Editing Mode' : 'Fill The Form Bellow'
+    const tableTitle = selectedCourses.length === 1 ? ' Course Selected' : ' Courses Selected'
+    const selectedSize = selectedCourses.length
+
 
   return (
 
     <div className="container" >
     <Space>
-      <Card title="Fill The Form Bellow" style={{width : 400}} >
+      <Card title={formTitle} style={{width : 400 }} headStyle={{color : editingMode ? 'red' : '' }} >
         <Form
           {...layout}
           name="basic"
           initialValues={{ remember: false }}
           onFinish={onFinish}
-          onFinishFailed={onFinishFailed}>
+          onFinishFailed={onFinishFailed}
+          form={form}>
             
-            <Form.Item label="Course Number"  name="CourseId" >
+            <Form.Item label={editingMode ? 'Editing Number' : "Course Number" }  name="CourseId" >
               {/* <label>{editingMode ? activeCourse.id : id +1}</label> */}
-              <Title level={3}> {editingMode ? activeCourse.id : id +1} </Title>
+              <Title level={3}> {editingMode ? activeCourse.id : Id +1} </Title>
             </Form.Item>
-            <Form.Item label="Course Grade"  name="Course Grade" rules={[{ required: true, message: 'Please Select Course Grade!' }]} >
+            <Form.Item label="Course Grade"  name="Grade" rules={[{ required: true, message: 'Please Select Course Grade!' }]} >
               <Select placeholder="Select Course Grade" defaultValue={activeCourse.gradeLetter} onChange={onGradeChange} allowClear >
                 {options}
               </Select>
             </Form.Item>
-            <Form.Item label="Course Credit"  name="Course Credit" rules={[{ required: true, message: 'Please input Course Credit!' }]} >
-              <InputNumber style={{width : 232}} placeholder="Enter Course Credit" min={1} max={20} defaultValue={activeCourse.credit} onChange={onCreditChange} />
+            <Form.Item label="Course Credit"  name="Credit" rules={[{ required: true, message: 'Please input Course Credit!' }]} >
+              <InputNumber style={{width : 232}}  placeholder="Enter Course Credit" min={1} max={20} defaultValue="" value={activeCourse.credit} onChange={onCreditChange} />
             </Form.Item>
             <Form.Item {...tailLayout}>
-               <Button type="primary" htmlType="submit" > Save </Button>
+               <Button type="primary" htmlType="submit" onDoubleClick={calculator}> Save </Button>
             </Form.Item>
         </Form>
     
@@ -205,7 +221,7 @@ const App = () => {
 
       <Card title="Courses Info" style={{width : 700}} >
         <Button type="primary" disabled={!hasSelected} onClick={deleteCourses} loading={loading}>Delete</Button>
-        <span style={{ marginLeft: 8 }} >{selectedCourses.length > 0 ? selectedCourses.length + ' Courses Selected' : '' } </span>
+        <span style={{ marginLeft: 8 }} >{hasSelected ? selectedSize + tableTitle : '' } </span>
         <Table rowSelection={rowSelection} columns={columns} dataSource={courses} onRow={(record, rowIndex) => {
     return {
       onClick: event => {editCourseInfo(record.id)} }; }}/>
