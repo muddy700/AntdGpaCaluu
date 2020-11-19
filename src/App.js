@@ -1,6 +1,6 @@
-import { Card , Table , Form, Input, Button, Checkbox , InputNumber , Select , List , Spin , Space , Typography} from 'antd';
+import { Card , Table , Form,  Button, InputNumber , Select , Spin , Space , Typography} from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
-import React , { useState, usestate } from 'react'
+import React , { useState } from 'react'
 import './index.css'
 
 const layout = {
@@ -40,7 +40,7 @@ const App = () => {
     },
   ];
 
-    const initialGrades = [
+    const grades = [
     { name : 'A' , value : 5} , 
     { name : 'B+' , value : 4} , 
     { name : 'B' , value : 3} , 
@@ -49,17 +49,19 @@ const App = () => {
     { name : 'E' , value : 0.5} , 
     { name : 'F' , value : 0 }
   ]
-  const initialCourses = [
-    { key : 1 , id : 1 , gradePoint : 2 , gradeLetter : 'C', credit : 10},
-    { key : 2 , id : 2 , gradePoint : 5 , gradeLetter : 'A' , credit : 7},
-            ]
+  // const initialCourses = [
+  //   { key : 1 , id : 1 , gradePoint : 2 , gradeLetter : 'C', credit : 10},
+  //   { key : 2 , id : 2 , gradePoint : 5 , gradeLetter : 'A' , credit : 7},
+            // ]
   const course = { id : '' , gradePoint : 'gp' , gradeLetter : 'gl' , credit : 'cr'}
-  const [grades , setGrades ] = useState(initialGrades)
+  // const [grades , setGrades ] = useState(initialGrades)
   const [courses , setCourses ]  = useState([])
   const [gpa , setGpa ] = useState('')
   const [selectedRowKeys , setSelectedRowKeys ] = useState([])
   const [editingMode , setEditingMode ] = useState(false)
   const [activeCourse , setActiveCourse ] = useState(course)
+  const [selectedCourses , setSelectedCourses ] = useState([])
+  const [loading, setLoading ] = useState(false)
 
   const { Title } = Typography
   const { option } = Select
@@ -91,8 +93,13 @@ const App = () => {
     };
 
       const calculator = () => {
-        console.log('size ' + id)
-      const product = courses.map((data) => {return data.credit * data.gradePoint})
+        if(courses.length <= 0){
+          setGpa('')
+        }
+        else{
+
+          console.log('size ' + id)
+          const product = courses.map((data) => {return data.credit * data.gradePoint})
       console.log('product '+ product)
       const sumOfProduct = product.reduce((total , data) => total = total + data )
       console.log('sop ' + sumOfProduct)
@@ -103,6 +110,7 @@ const App = () => {
       console.log('gpa ' + gpa1.toFixed(1))
       setGpa(gpa1)  
       console.log(courses.length)
+    }
 
       }
     
@@ -110,7 +118,7 @@ const App = () => {
       console.log('Failed:', errorInfo);
     };
     const onGradeChange = (value) => {
-      const letter = initialGrades.find((data) => data.value === value)
+      const letter = grades.find((data) => data.value === value)
       setActiveCourse({...activeCourse , gradePoint : value , gradeLetter : letter.name})
     }
     const onCreditChange = (value) => {
@@ -120,7 +128,27 @@ const App = () => {
 
     const onSelectChange = (selectedRowKeys) => {
       setSelectedRowKeys(selectedRowKeys)
-      console.log(setSelectedRowKeys.length)
+      const selected = courses.filter((data) => selectedRowKeys.includes(data.key))
+      const selectedIds = selected.map((data) => {return data.id})
+      setSelectedCourses(selectedIds)
+      // console.log(setSelectedRowKeys[0])
+    }
+
+    // console.log('mvp ' + mvp[0].gradeLetter)
+
+    const deleteCourses = () => {
+      setLoading(true)
+      // console.log(selectedCourses.length)
+      // console.log(selectedCourses)
+      setTimeout(  () => {
+      const remainingCourses = courses.filter((data) => !selectedCourses.includes(data.id))
+      setCourses(remainingCourses)
+      console.log(courses)
+      setSelectedCourses([])
+      setSelectedRowKeys([])
+      setLoading(false)
+    } , 500)
+    calculator()
     }
     const editCourseInfo = (value) => {
       const selecte = courses.find((data) => data.id === value)
@@ -136,6 +164,7 @@ const App = () => {
       selectedRowKeys,
       onChange: onSelectChange,
     };
+    const hasSelected = selectedCourses.length > 0
 
   return (
 
@@ -150,7 +179,8 @@ const App = () => {
           onFinishFailed={onFinishFailed}>
             
             <Form.Item label="Course Id"  name="CourseId" >
-              <label>{editingMode ? activeCourse.id : id +1}</label>
+              {/* <label>{editingMode ? activeCourse.id : id +1}</label> */}
+              <Title level={3}> {editingMode ? activeCourse.id : id +1} </Title>
             </Form.Item>
             <Form.Item label="Course Grade"  name="Course Grade" rules={[{ required: true, message: 'Please Select Course Grade!' }]} >
               <Select placeholder="Select Course Grade" defaultValue={activeCourse.gradeLetter} onChange={onGradeChange} allowClear >
@@ -168,14 +198,17 @@ const App = () => {
       </Card>
 
       <Card title="Courses Info" style={{width : 700}} >
+        <Button type="primary" disabled={!hasSelected} onClick={deleteCourses} loading={loading}>Delete</Button>
+        <span style={{ marginLeft: 8 }} >{selectedCourses.length > 0 ? selectedCourses.length + ' Courses Selected' : '' } </span>
         <Table rowSelection={rowSelection} columns={columns} dataSource={courses} onRow={(record, rowIndex) => {
     return {
       onClick: event => {editCourseInfo(record.id)} }; }}/>
       </Card>
 
       <Card title="Result" style={{width : 300}} >
-        <Title level={2}>{gpa ? 'Your GPA Is : ' + gpa.toFixed(1) : spinner } </Title>
-        <Title leve={4}>{activeCourse.id} - {activeCourse.gradeLetter} - {activeCourse.gradePoint} - {activeCourse.credit}</Title>
+        <Title level={2}>{gpa !== '' ? 'Your GPA Is : ' + gpa.toFixed(1) : spinner } </Title>
+        {/* <Title leve={4}>{activeCourse.id} - {activeCourse.gradeLetter} - {activeCourse.gradePoint} - {activeCourse.credit}</Title> */}
+        {/* <Title level={5}>{selectedCourses.length} Courses Selected</Title> */}
       </Card>
 
       </Space>
