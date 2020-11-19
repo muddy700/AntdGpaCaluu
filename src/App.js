@@ -50,10 +50,10 @@ const App = () => {
     { name : 'F' , value : 0 }
   ]
   const initialCourses = [
-    {  id : 1 , gradePoint : 2 , gradeLetter : 'C', credit : 10},
-    {  id : 2 , gradePoint : 5 , gradeLetter : 'A' , credit : 7},
+    { key : 1 , id : 1 , gradePoint : 2 , gradeLetter : 'C', credit : 10},
+    { key : 2 , id : 2 , gradePoint : 5 , gradeLetter : 'A' , credit : 7},
             ]
-  const course = { id : '' , gradePoint : '' , gradeLetter : '' , credit : ''}
+  const course = { id : '' , gradePoint : 'gp' , gradeLetter : 'gl' , credit : 'cr'}
   const [grades , setGrades ] = useState(initialGrades)
   const [courses , setCourses ]  = useState([])
   const [gpa , setGpa ] = useState('')
@@ -71,8 +71,23 @@ const App = () => {
     })
     
     const onFinish = values => {
-      Id += 1
-      setCourses([...courses , {...activeCourse ,  id : Id}])
+      if(editingMode){
+        const newCoursesList = courses.map((data) => {
+        if(data.id === activeCourse.id){
+          return {...data , gradeLetter : activeCourse.gradeLetter , gradePoint : activeCourse.gradePoint , credit : activeCourse.credit}
+        }
+        else {
+          return data
+        }})
+
+        setCourses(newCoursesList)
+        setEditingMode(false)
+      }
+      else {
+
+        Id += 1
+        setCourses([...courses , {...activeCourse , key : Id , id : Id}])
+      }
     };
 
       const calculator = () => {
@@ -105,7 +120,7 @@ const App = () => {
 
     const onSelectChange = (selectedRowKeys) => {
       setSelectedRowKeys(selectedRowKeys)
-      console.log('selecte ' + setSelectedRowKeys)
+      console.log(setSelectedRowKeys.length)
     }
     const editCourseInfo = (value) => {
       const selecte = courses.find((data) => data.id === value)
@@ -135,10 +150,10 @@ const App = () => {
           onFinishFailed={onFinishFailed}>
             
             <Form.Item label="Course Id"  name="CourseId" >
-              <label>{id +1}</label>
+              <label>{editingMode ? activeCourse.id : id +1}</label>
             </Form.Item>
             <Form.Item label="Course Grade"  name="Course Grade" rules={[{ required: true, message: 'Please Select Course Grade!' }]} >
-              <Select placeholder="Select Course Grade" value={activeCourse.gradeLetter} onChange={onGradeChange} allowClear >
+              <Select placeholder="Select Course Grade" defaultValue={activeCourse.gradeLetter} onChange={onGradeChange} allowClear >
                 {options}
               </Select>
             </Form.Item>
@@ -160,6 +175,7 @@ const App = () => {
 
       <Card title="Result" style={{width : 300}} >
         <Title level={2}>{gpa ? 'Your GPA Is : ' + gpa.toFixed(1) : spinner } </Title>
+        <Title leve={4}>{activeCourse.id} - {activeCourse.gradeLetter} - {activeCourse.gradePoint} - {activeCourse.credit}</Title>
       </Card>
 
       </Space>
