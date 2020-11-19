@@ -1,6 +1,6 @@
 import { Card , Table , Form,  Button, InputNumber , Select , Spin , Space , Typography} from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
-import React , { useState } from 'react'
+import React , { useState , useEffect } from 'react'
 import './index.css'
 
 const layout = {
@@ -53,13 +53,13 @@ const App = () => {
   //   { key : 1 , id : 1 , gradePoint : 2 , gradeLetter : 'C', credit : 10},
   //   { key : 2 , id : 2 , gradePoint : 5 , gradeLetter : 'A' , credit : 7},
             // ]
-  const course = { id : '' , gradePoint : 'gp' , gradeLetter : 'gl' , credit : 'cr'}
+  // const course = { id :'' , gradePoint : '' , gradeLetter : '' , credit : ''}
   // const [grades , setGrades ] = useState(initialGrades)
   const [courses , setCourses ]  = useState([])
   const [gpa , setGpa ] = useState('')
   const [selectedRowKeys , setSelectedRowKeys ] = useState([])
   const [editingMode , setEditingMode ] = useState(false)
-  const [activeCourse , setActiveCourse ] = useState(course)
+  const [activeCourse , setActiveCourse ] = useState({})
   const [selectedCourses , setSelectedCourses ] = useState([])
   const [loading, setLoading ] = useState(false)
 
@@ -93,6 +93,7 @@ const App = () => {
     };
 
       const calculator = () => {
+        setActiveCourse({})
         if(courses.length <= 0){
           setGpa('')
         }
@@ -125,6 +126,10 @@ const App = () => {
       const changedValue = parseFloat(value)
       setActiveCourse({...activeCourse , credit : changedValue})
     }
+    
+    useEffect(() => {
+  calculator()
+    }, [courses.length])
 
     const onSelectChange = (selectedRowKeys) => {
       setSelectedRowKeys(selectedRowKeys)
@@ -150,9 +155,10 @@ const App = () => {
     } , 500)
     calculator()
     }
+
     const editCourseInfo = (value) => {
-      const selecte = courses.find((data) => data.id === value)
-      setActiveCourse(selecte)
+      const selected = courses.find((data) => data.id === value)
+      setActiveCourse(selected)
       setEditingMode(true)
       console.log('coz ni ' + activeCourse.gradeLetter)
       console.log('id ni ' + activeCourse.id)
@@ -174,11 +180,11 @@ const App = () => {
         <Form
           {...layout}
           name="basic"
-          // initialValues={{ remember: false }}
+          initialValues={{ remember: false }}
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}>
             
-            <Form.Item label="Course Id"  name="CourseId" >
+            <Form.Item label="Course Number"  name="CourseId" >
               {/* <label>{editingMode ? activeCourse.id : id +1}</label> */}
               <Title level={3}> {editingMode ? activeCourse.id : id +1} </Title>
             </Form.Item>
@@ -191,7 +197,7 @@ const App = () => {
               <InputNumber style={{width : 232}} placeholder="Enter Course Credit" min={1} max={20} defaultValue={activeCourse.credit} onChange={onCreditChange} />
             </Form.Item>
             <Form.Item {...tailLayout}>
-               <Button type="primary" htmlType="submit" onMouseLeave={calculator}> Save </Button>
+               <Button type="primary" htmlType="submit" > Save </Button>
             </Form.Item>
         </Form>
     
