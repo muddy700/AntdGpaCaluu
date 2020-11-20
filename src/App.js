@@ -1,23 +1,25 @@
+import { CourseForm , TotalCourses , LastStep} from './components/courseForm'
 import { CourseResult } from './components/courseResult'
 import { CourseTable } from './components/courseTable'
-import { CourseForm } from './components/courseForm'
 import React , { useState , useEffect } from 'react'
-import { Form, Space , Affix } from 'antd';
+import { Space , Card , Steps , Form , message} from 'antd';
 import './index.css'
 
 let Id = 0
 const App = () => {
 
-  const [courses , setCourses ]  = useState([])
-  const [gpa , setGpa ] = useState('')
+  const [selectedCourses , setSelectedCourses ] = useState([])
   const [selectedRowKeys , setSelectedRowKeys ] = useState([])
   const [editingMode , setEditingMode ] = useState(false)
   const [activeCourse , setActiveCourse ] = useState({})
-  const [selectedCourses , setSelectedCourses ] = useState([])
+  const [totalCourses , setTotalCourses ] = useState(undefined)
   const [loading, setLoading ] = useState(false)
+  const [courses , setCourses ]  = useState([])
+  const [ current , setCurrent ] = useState(0)
+  const [gpa , setGpa ] = useState('')
   const [form] = Form.useForm()
-  const [top, setTop] = useState(10);
-
+  const [isFull , setIsFull ] =useState(false)
+  const { Step } = Steps
 
     const onFinish = values => {
       // e.preventDefault()
@@ -56,6 +58,19 @@ const App = () => {
       const gpa1 = sumOfProduct/sumOfCredit
       setGpa(gpa1)  
     }
+
+    if(totalCourses === courses.length) {
+      // const total = parseFloat(totalCourses)
+      // setCurrent(current +1)
+      next()
+      setIsFull(true)
+    }
+    // if(editingMode){
+    //   setCurrent(1)
+    // }
+    // if(totalCourses > 0 && totalCourses !== courses.length) {
+    //   setCurrent(1)
+    // }
     setActiveCourse({})
       }
   
@@ -64,10 +79,15 @@ const App = () => {
         }, [courses.length])
 
     const onSelectChange = (selectedRowKeys) => {
+           if(current === steps.length-1) {
+        message.error('Go Back And Click Again')
+      }
+      else {
       setSelectedRowKeys(selectedRowKeys)
       const selected = courses.filter((data) => selectedRowKeys.includes(data.key))
       const selectedIds = selected.map((data) => {return data.id})
       setSelectedCourses(selectedIds)
+      }
     }
 
     const deleteCourses = () => {
@@ -84,26 +104,63 @@ const App = () => {
     }
 
     const editCourseInfo = (value) => {
-      const selected = courses.find((data) => data.id === value)
-      setActiveCourse(selected)
-      setEditingMode(true)
-      form.setFieldsValue({ Credit : selected.credit , Grade : selected.gradeLetter})
+      if(current === steps.length-1) {
+        message.error('Go Back And Click Again')
+      }
+      else {
+        const selected = courses.find((data) => data.id === value)
+        setActiveCourse(selected)
+        setEditingMode(true)
+        form.setFieldsValue({ Credit : selected.credit , Grade : selected.gradeLetter})
+      }
         }
 
+
+        const next = () => {
+          setCurrent(current + 1)
+            if(totalCourses !== courses.length) {
+      setIsFull(false)
+    }
+        }
+        const previous = () => {
+          setCurrent(current -1)
+        }
+        const resetValues = () => {
+          setCurrent(0)
+          setEditingMode(false)
+          setGpa('')
+          setTotalCourses('')
+          setCourses([])
+        }
+        const cozFom = <CourseForm isFull={isFull} previous={previous} calculator={calculator} editingMode={editingMode} onFinish={onFinish} form={form} activeCourse={activeCourse} Id={Id} setActiveCourse={setActiveCourse} />
+        const totoCoz = <TotalCourses totalCourses={totalCourses} setTotalCourses={setTotalCourses} next={next} />
+        const Results =  <LastStep previous={previous} resetValues={resetValues} />
+        
+        const steps = [
+          { title : 'Total Courses' , content : totoCoz } , 
+          { title : 'Course Form' , content : cozFom } ,
+          { title : 'Result' , content : Results }
+        ]
+        const list = steps.map((item) =>  <Step key={item.title} title={item.title} />  )
+
     const rowSelection = {
+
       selectedRowKeys,
       onChange: onSelectChange,
     };
-
   return (
     <div className="container" >
       <Space>
-
-        <Affix offsetTop={0}>
-          <CourseForm calculator={calculator} editingMode={editingMode} onFinish={onFinish} form={form}activeCourse={activeCourse} Id={Id} setActiveCourse={setActiveCourse} />
-        </Affix>
+        <Card>
+          <div > 
+          <Steps current={current}>
+            {list}
+           </Steps> 
+           </div>
+          <div > {steps[current].content} </div>
+        </Card>
         <CourseTable deleteCourses={deleteCourses} selectedCourses={selectedCourses} rowSelection={rowSelection} loading={loading} editCourseInfo={editCourseInfo} courses={courses}/>
-        <CourseResult gpa={gpa} />
+        <CourseResult gpa={gpa} totalCourses={totalCourses} />
       </Space>
     </div>
   );

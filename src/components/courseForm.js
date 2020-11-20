@@ -1,4 +1,5 @@
-import { Card , Form,  Button, InputNumber , Select , Typography} from 'antd';
+import { Card , Form,  Button, InputNumber , Select , Result , Space , Typography} from 'antd';
+import { SmileOutlined } from '@ant-design/icons';
 import '../index.css'
 
 const layout = {
@@ -28,7 +29,7 @@ export const CourseForm = (props) => {
             { name : 'F' , value : 0 }
                      ]
                      
-    const { editingMode , onFinish , calculator , activeCourse , Id , form , setActiveCourse } = props
+    const { editingMode , onFinish , calculator , activeCourse , previous , Id , form , setActiveCourse , isFull} = props
     const options =  grades.map((data) => {
         return(
             <option key={data.value} value={data.value} >{data.name}</option>
@@ -54,24 +55,65 @@ export const CourseForm = (props) => {
           credit: changedValue
       })
   }
+  const id = isFull ? 'Table Is Full.' : Id+1
+  const hider = isFull && !editingMode
+
 
     return(
        <Card title={formTitle} style={{width : 400 }} headStyle={{color : editingMode ? 'red' : '' }} >
             <Form  {...layout} name="basic" initialValues={{ remember: false }} onFinish={onFinish}  form={form}>
                 <Form.Item label={editingMode ? 'Editing Number' : "Course Number" }  name="CourseId" >
-                    <Title level={3}> {editingMode ? activeCourse.id : Id +1} </Title>
+                    <Title level={3}> {editingMode ? activeCourse.id : id} </Title>
                 </Form.Item>
                 <Form.Item label="Course Grade"  name="Grade" rules={[{ required: true, message: 'Please Select Course Grade!' }]} >
-                    <Select placeholder="Select Course Grade" defaultValue={activeCourse.gradeLetter} onChange={onGradeChange} allowClear >
+                    <Select disabled={hider} placeholder="Select Course Grade" defaultValue={activeCourse.gradeLetter} onChange={onGradeChange} allowClear >
                         {options}
                     </Select>
                 </Form.Item>
                 <Form.Item label="Course Credit"  name="Credit" rules={[{ required: true, message: 'Please input Course Credit!' }]} >
-                    <InputNumber   style={{width : 232}}  placeholder="Enter Course Credit" min={1} max={20} defaultValue="" value={activeCourse.credit} onChange={onCreditChange} />
-                </Form.Item>
+                    <InputNumber  disabled={hider} style={{width : 232}}  placeholder="Enter Course Credit" min={1} max={20} value={activeCourse.credit} onChange={onCreditChange} />
+                </Form.Item> <Space>
+                    
                 <Form.Item {...tailLayout}>
-                    <Button type="primary" htmlType="submit" onDoubleClick={calculator}> Save </Button>
+                    <Button type="primary" onClick={previous}> Previous</Button>
+                </Form.Item>  &nbsp;  &nbsp;  &nbsp;
+                <Form.Item {...tailLayout}>
+                    <Button type="primary" htmlType="submit" onDoubleClick={calculator} disabled={hider}> Save </Button>
                 </Form.Item>
+                </Space>
             </Form>
       </Card>
 ) }
+
+export const TotalCourses = (props) => {
+    const { totalCourses , setTotalCourses , next } = props
+    return(
+        <Card title="How Many Courses Do You Have ?" style={{width : 400 }}>
+            <Form {...layout} name="basic" onFinish={next}>
+                <Form.Item label="Total" name="total" rules={[{ required : true , message : 'Please Input Total Courses'}]}>
+                    <InputNumber  style={{width : 232}}  min={1} max={20} defaultValue={totalCourses}  value={totalCourses}  onChange={setTotalCourses} />
+                </Form.Item>
+                <Form.Item {...tailLayout}>
+                    <Button type="primary" htmlType="submit"> Next</Button>
+                </Form.Item>
+            </Form>
+        </Card>
+    )
+}
+
+export const LastStep = (props) => {
+    const { previous , resetValues} = props
+    return(
+        <Result
+    icon={<SmileOutlined />}
+    status="success"
+    title="Great, We Have Done All The Steps!"
+    extra={
+        <>
+        <Button type="primary" onClick={previous}>Go Back</Button>  
+        <Button type="primary" onClick={resetValues}> Go Home</Button>  
+        </>
+        }
+  />
+    )
+}
