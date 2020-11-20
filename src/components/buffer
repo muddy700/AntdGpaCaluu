@@ -1,78 +1,38 @@
-import { Form, Input, Button, Select , label , InputNumber } from 'antd';
-import '../index.css'
 
-const { Option } = Select;
+  // const initialCourses = [
+  //   { key : 1 , id : 1 , gradePoint : 2 , gradeLetter : 'C', credit : 10},
+  //   { key : 2 , id : 2 , gradePoint : 5 , gradeLetter : 'A' , credit : 7},
+  // ]
+  // const course = { id :'' , gradePoint : '' , gradeLetter : '' , credit : ''}
+  // const [grades , setGrades ] = useState(initialGrades)
 
-   const layout = {
-       labelCol: {
-           span: 8
-       },
-       wrapperCol: {
-           span: 16
-       },
-   };
-   const tailLayout = {
-       wrapperCol: {
-           offset: 8,
-           span: 16
-       },
-   };
 
- export const CourseForm = ( { grades , changeGrade , changeCredit }) => {
 
-const options =  grades.map((data) => {
-        return(
-            <option key={data.value} value={data.value} >{data.name}</option>
-        )
-    })
- 
+      
+    // const onFinishFailed = errorInfo => {
+    //   console.log('Failed:', errorInfo);
+    // };
 
-    const Demo = () => {}
-            const onFinish = values => {
-                console.log('Success:', values);
-            };
-        
-            const onFinishFailed = errorInfo => {
-                console.log('Failed:', errorInfo);
-            };
-        
-    return(
-  <Form
-      {...layout}
-      name="basic"
-      initialValues={{ remember: true }}
-      onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
-    >
-     <Form.Item
-        label="Course Id"
-        name="courseId"
-      >
-        <label > 1 </label>
-      </Form.Item>
-          <Form.Item name="grade" label="Course Grade" rules={[{ required: true , message: 'Please input Course Grade!' }]}>
-        <Select
-          placeholder="Select Course Grade"
-          onChange={(e) => changeGrade(e.target.value)}
-          allowClear
-        >
-        {options}
-        </Select>
-      </Form.Item>
-      <Form.Item
-        label="Course Credit"
-        name="credit"
-        rules={[{ required: true, message: 'Please input Course Credit!' }]}
-      >
-        <Input />
-        {/* <InputNumber /> */}
-      </Form.Item>
+      const calculator = () => {
+      form.resetFields()
 
-      <Form.Item {...tailLayout}>
-        <Button type="primary" htmlType="submit">
-          Save
-        </Button>
-      </Form.Item>
-    </Form>
-    )
+        if(courses.length <= 0){
+          setGpa('')
+        }
+        else{
+
+      console.log('size ' + id)
+      const product = courses.map((data) => {return data.credit * data.gradePoint})
+      console.log('product '+ product)
+      const sumOfProduct = product.reduce((total , data) => total = total + data )
+      console.log('sop ' + sumOfProduct)
+      const credits = courses.map((data) => {return data.credit })
+      const sumOfCredit = credits.reduce((total ,data) => {return total = total + data })
+      console.log('totalCredit ' + sumOfCredit)
+      const gpa1 = sumOfProduct/sumOfCredit
+      console.log('gpa ' + gpa1.toFixed(1))
+      setGpa(gpa1)  
+      console.log(courses.length)
     }
+    setActiveCourse({})
+      }
