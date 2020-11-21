@@ -60,7 +60,7 @@ export const CourseForm = (props) => {
 
 
     return(
-       <Card title={formTitle} style={{width : 400 }} headStyle={{color : editingMode ? 'red' : '' }} >
+       <Card title={formTitle} style={{width : 440 }} headStyle={{color : editingMode ? 'red' : '' }} >
             <Form  {...layout} name="basic" initialValues={{ remember: false }} onFinish={onFinish}  form={form}>
                 <Form.Item label={editingMode ? 'Editing Number' : "Course Number" }  name="CourseId" >
                     <Title level={3}> {editingMode ? activeCourse.id : id} </Title>
@@ -71,14 +71,14 @@ export const CourseForm = (props) => {
                     </Select>
                 </Form.Item>
                 <Form.Item label="Course Credit"  name="Credit" rules={[{ required: true, message: 'Please input Course Credit!' }]} >
-                    <InputNumber  disabled={hider} style={{width : 232}}  placeholder="Enter Course Credit" min={1} max={20} value={activeCourse.credit} onChange={onCreditChange} />
+                    <InputNumber  disabled={hider} style={{width : 260}}  placeholder="Enter Course Credit" min={1} max={20} value={activeCourse.credit} onChange={onCreditChange} />
                 </Form.Item> <Space>
                     
                 <Form.Item {...tailLayout}>
                     <Button type="primary" onClick={previous}> Previous</Button>
                 </Form.Item>  &nbsp;  &nbsp;  &nbsp;
                 <Form.Item {...tailLayout}>
-                    <Button type="primary" htmlType="submit" onDoubleClick={calculator} disabled={hider}> Save </Button>
+                    <Button type="primary" htmlType="submit" onDoubleClic={calculator} disabled={hider}> Save </Button>
                 </Form.Item>
                 </Space>
             </Form>
@@ -88,10 +88,10 @@ export const CourseForm = (props) => {
 export const TotalCourses = (props) => {
     const { totalCourses , setTotalCourses , next } = props
     return(
-        <Card title="How Many Courses Do You Have ?" style={{width : 400 }}>
+        <Card title="How Many Courses Do You Have ?" style={{width : 440 }}>
             <Form {...layout} name="basic" onFinish={next}>
                 <Form.Item label="Total" name="total" rules={[{ required : true , message : 'Please Input Total Courses'}]}>
-                    <InputNumber  style={{width : 232}}  min={1} max={20} defaultValue={totalCourses}  value={totalCourses}  onChange={setTotalCourses} />
+                    <InputNumber  style={{width : 255}}  min={1} max={20} defaultValue={totalCourses}  value={totalCourses}  onChange={setTotalCourses} />
                 </Form.Item>
                 <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit"> Next</Button>

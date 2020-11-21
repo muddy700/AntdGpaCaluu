@@ -42,6 +42,7 @@ const App = () => {
         setCourses([...courses , {...activeCourse , key : Id , id : Id}])
       }
       setActiveCourse({})
+      // calculator()
     }
     
     const calculator = () => {
@@ -60,24 +61,16 @@ const App = () => {
     }
 
     if(totalCourses === courses.length) {
-      // const total = parseFloat(totalCourses)
-      // setCurrent(current +1)
       next()
       setIsFull(true)
     }
-    // if(editingMode){
-    //   setCurrent(1)
-    // }
-    // if(totalCourses > 0 && totalCourses !== courses.length) {
-    //   setCurrent(1)
-    // }
     setActiveCourse({})
       }
   
     useEffect(() => {
       calculator()
         }, [courses.length])
-
+  
     const onSelectChange = (selectedRowKeys) => {
            if(current === steps.length-1) {
         message.error('Go Back And Click Again')
@@ -101,6 +94,8 @@ const App = () => {
       setLoading(false)
     } , 500)
     calculator()
+    setIsFull(false)
+    setCurrent(1)
     }
 
     const editCourseInfo = (value) => {
@@ -137,8 +132,8 @@ const App = () => {
         const Results =  <LastStep previous={previous} resetValues={resetValues} />
         
         const steps = [
-          { title : 'Total Courses' , content : totoCoz } , 
-          { title : 'Course Form' , content : cozFom } ,
+          { title : 'Total' , content : totoCoz } , 
+          { title : 'Form' , content : cozFom } ,
           { title : 'Result' , content : Results }
         ]
         const list = steps.map((item) =>  <Step key={item.title} title={item.title} />  )
